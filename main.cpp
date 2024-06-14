@@ -5,11 +5,10 @@
 #include <wx/textFile.h>
 #include <wx/filename.h>
 #include <wx/dir.h>
-//wxIMPLEMENT_APP(App);
 
 bool MainFrame::__is_wx = true;
 
-
+//заимствование; развёртка макроса
 int main(int argc, char* argv[]) {
 	wxApp::SetInstance(new App());
 	wxEntryStart(argc, argv);
@@ -20,3 +19,4 @@ int main(int argc, char* argv[]) {
 	wxEntryCleanup();
 	return 0;
 }
+//

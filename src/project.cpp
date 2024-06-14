@@ -5,11 +5,11 @@
 	void MainFrame::print_error(wxString msg) {
 		if (__is_wx)
 			wxMessageBox(msg, wxString("Ошибка"), wxOK | wxICON_WARNING);
-		//	curr_error = msg;
-		throw std::runtime_error {msg};
+		else
+			throw std::runtime_error {msg};
 	}
 	
-	MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) // MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title);
+	MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 	{
 		SetWindowStyle(wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)); // заимствование, делает окно нерастяжимым и блокирует развёртку 
 		wxPanel* panel = new wxPanel(this, wxID_ANY);
@@ -50,13 +50,10 @@
 		SaveNoteButton->Disable();
 		NoteTextDisplay->Disable();
 		NoteTitleDisplay->Disable();
-		NoteTextDisplay->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-		NoteTitleDisplay->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-		SaveNoteButton->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-		CheckListBox = new wxCheckListBox(panel, wxID_ANY, wxPoint(5, 240), wxSize(150, 150)); // лсит для чек-боксов
-		CheckBoxName = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(155, 240), wxSize(150, 25)); //поле для ввода названия чек-боксов
-		AddCheckBox = new wxButton(panel, wxID_ANY, "Add CheckBox", wxPoint(320, 240), wxSize(96, 32)); //кнопка для добавления чек-бокса
-		AddCheckBox->Bind(wxEVT_BUTTON, &MainFrame::AddCheckboxButtonClicked, this); //бинд для кнопки добавления чек-бокса
+		CheckListBox = new wxCheckListBox(panel, wxID_ANY, wxPoint(5, 240), wxSize(150, 150)); 
+		CheckBoxName = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(155, 240), wxSize(150, 25)); 
+		AddCheckBox = new wxButton(panel, wxID_ANY, "Add CheckBox", wxPoint(320, 240), wxSize(96, 32)); 
+		AddCheckBox->Bind(wxEVT_BUTTON, &MainFrame::AddCheckboxButtonClicked, this); 
 		CompletedTasksList = new wxCheckListBox(panel, wxID_ANY, wxPoint(510, 450), wxSize(200, 100));
 		UncompletedTasksList = new wxCheckListBox(panel, wxID_ANY, wxPoint(510, 580), wxSize(200, 100));
 		CompletedTasksList->Disable();
@@ -65,13 +62,11 @@
 		LoadNotes();
 	}
 
-	// tested
-	void MainFrame::AddCheckboxButtonClicked(wxCommandEvent& evt) // void AddCheckboxButtonClicked(wxCommandEvent& evt);
+	void MainFrame::AddCheckboxButtonClicked(wxCommandEvent& evt) 
 	{
 		wxString CheckBoxHead = CheckBoxName->GetValue();
 		if (CheckBoxHead.IsEmpty())
 		{
-			//wxMessageBox("Название чек-бокса не может быть пустым", "Предупреждение", wxICON_WARNING | wxOK);
 			print_error("Название чек-бокса не может быть пустым");
 			return;
 		}
@@ -81,16 +76,14 @@
 	}
 
 
-	//тест есть
-	void MainFrame::AddNoteButtonClicked(wxCommandEvent& evt) // void AddNoteButtonClicked(wxCommandEvent& evt);
+	void MainFrame::AddNoteButtonClicked(wxCommandEvent& evt) 
 	{
 		wxString DescriptionText = DescriptionOfNote->GetValue();
 		wxString TitleText = TitleOfNote->GetValue();
 		if (TitleText.IsEmpty())
 		{
-			//wxMessageBox("Название заметки не может быть пустым.", "Предупреждение", wxOK | wxICON_WARNING);
 			print_error("Название заметки не может быть пустым");
-			return; // Прерываем выполнение функции
+			return; 
 		}
 		std::string basePath = "NotesBase/";
 		std::string filename = basePath + TitleText.ToStdString() + ".txt";
@@ -99,7 +92,6 @@
 		{
 			file << DescriptionText.ToStdString();
 			file << "\n";
-			// запись чек-боксов
 			for (unsigned int i = 0; i < CheckListBox->GetCount(); ++i)
 			{
 				wxString itemText = CheckListBox->GetString(i);
@@ -109,7 +101,7 @@
 			NotesArea->Append(TitleText);
 			this->TitleOfNote->Clear();
 			this->DescriptionOfNote->Clear();
-			this->CheckListBox->Clear(); // тут чек-боксы очищаются
+			this->CheckListBox->Clear(); 
 			CheckListBox->Disable();
 			file.close();
 			wxMessageBox("Текст сохранен в файл '" + TitleText + ".txt'.", "Информация", wxOK | wxICON_INFORMATION);
@@ -120,7 +112,7 @@
 		}
 	}
 
-	//тест есть
+
 	void MainFrame::LoadNotes()
 	{
 
@@ -130,7 +122,7 @@
 		if (dir.IsOpened())
 		{
 			wxString filename;
-			bool cont = dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
+			bool cont = dir.GetFirst(&filename, "*.txt", wxDIR_FILES);
 			while (cont)
 			{
 				if (wxFileName::FileExists(basePath + filename) && wxFileName(filename).GetExt().Lower() == "txt")
@@ -143,13 +135,12 @@
 		}
 		else
 		{
-			print_error("Ошибка при открытии папки 'NotesBase'.");
-			//wxMessageBox("Ошибка при открытии папки 'NotesBase'.", "Ошибка", wxOK | wxICON_ERROR);
+			wxMessageBox("Ошибка при открытии папки 'NotesBase'.", "Ошибка", wxOK | wxICON_ERROR);
 		}
 	}
 
 
-	//тест есть
+	
 	void MainFrame::DeleteNoteButtonClicked(wxCommandEvent& evt)
 	{
 		int selectedIndex = NotesArea->GetSelection();
@@ -170,8 +161,7 @@
 		}
 		else
 		{
-			print_error("Пожалуйста, выберите заметку для удаления.");
-			//wxMessageBox("Пожалуйста, выберите заметку для удаления.", "Предупреждение", wxOK | wxICON_WARNING);
+			wxMessageBox("Пожалуйста, выберите заметку для удаления.", "Предупреждение", wxOK | wxICON_WARNING);
 		}
 	}
 
@@ -195,14 +185,14 @@
 				std::vector<std::string> checked1Block;
 				while (std::getline(file, line))
 				{
-					// Разделяем строку на две части
+					
 					size_t pos = line.find(":");
 					if (pos != std::string::npos)
 					{
-						std::string checkboxName = line.substr(0, pos); // Получаем часть строки до ":"
-						std::string status = line.substr(pos + 2); // Получаем часть строки после ": "
+						std::string checkboxName = line.substr(0, pos); 
+						std::string status = line.substr(pos + 2); 
 
-						// Проверяем статус
+						
 						if (status == "Unchecked 0")
 						{
 							unchecked0Block.push_back(checkboxName);
@@ -222,7 +212,6 @@
 					}
 				}
 				file.close();
-				// Добавляем названия чек-боксов в wxCheckListBox0 и wxCheckListBox1
 				for (const auto& str : unchecked0Block)
 				{
 					UncompletedTasksList->Append(wxString(str));
@@ -235,12 +224,13 @@
 				{
 					CompletedTasksList->Check(i, true);
 				}
-				// Задаем содержимое заметки в NoteTextDisplay
 				NoteTextDisplay->SetValue(wxString(noteText));
 				NoteTextDisplay->Enable();
 				SaveNoteButton->Enable();
 				CompletedTasksList->Enable();
 				UncompletedTasksList->Enable();
+				SeeNoteButton->Disable();
+				DeleteNoteButton->Disable();
 			}
 			else
 			{
@@ -292,6 +282,8 @@
 				UncompletedTasksList->Clear();
 				CompletedTasksList->Disable();
 				UncompletedTasksList->Disable();
+				SeeNoteButton->Enable();
+				DeleteNoteButton->Enable();
 			}
 			else
 			{
@@ -304,18 +296,17 @@
 		}
 	}
 	
-
-	//тест есть
+	
 	void MainFrame::SearchButtonClicked(wxCommandEvent& evt)
 	{
-		wxString searchQuery = SearchField->GetValue();
-		if (!searchQuery.IsEmpty())
+		wxString searching = SearchField->GetValue();
+		if (!searching.IsEmpty())
 		{
 			NotesArea->DeselectAll();
 			for (unsigned long i = 0; i < NotesArea->GetCount(); ++i)
 			{
 				wxString noteName = NotesArea->GetString(i);
-				if (noteName.Lower().Find(searchQuery.Lower()) != wxNOT_FOUND)
+				if (noteName.Lower().Find(searching.Lower()) != wxNOT_FOUND)
 				{
 					NotesArea->SetSelection(i);
 				}
@@ -323,12 +314,10 @@
 		}
 		else
 		{
-			//wxMessageBox("Введите название заметки, которую хотите найти.", "Предупреждение", wxOK | wxICON_WARNING);
 			print_error("Введите название заметки, которую хотите найти.");
 		}
 	}
-
-
+	
 	bool App::OnInit()
 	{
 		MainFrame* mainFrame = new MainFrame("Notes");
