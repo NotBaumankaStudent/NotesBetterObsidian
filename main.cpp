@@ -13,7 +13,6 @@ int main(int argc, char* argv[]) {
 	wxApp::SetInstance(new App());
 	wxEntryStart(argc, argv);
 	wxTheApp->CallOnInit();
-
 	wxTheApp->OnRun();
 	wxTheApp->OnExit();
 	wxEntryCleanup();

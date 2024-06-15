@@ -1,7 +1,6 @@
 #include "project.h"
 
 
-
 	void MainFrame::print_error(wxString msg) {
 		if (__is_wx)
 			wxMessageBox(msg, wxString("Ошибка"), wxOK | wxICON_WARNING);
@@ -9,6 +8,7 @@
 			throw std::runtime_error {msg};
 	}
 	
+
 	MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 	{
 		SetWindowStyle(wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)); // заимствование, делает окно нерастяжимым и блокирует развёртку 
@@ -61,6 +61,7 @@
 		CheckListBox->Disable();
 		LoadNotes();
 	}
+
 
 	void MainFrame::AddCheckboxButtonClicked(wxCommandEvent& evt) 
 	{
@@ -140,7 +141,6 @@
 	}
 
 
-	
 	void MainFrame::DeleteNoteButtonClicked(wxCommandEvent& evt)
 	{
 		int selectedIndex = NotesArea->GetSelection();
@@ -166,7 +166,6 @@
 	}
 
 
-
 	void MainFrame::SeeNoteButtonClicked(wxCommandEvent& evt)
 	{
 		int selectedIndex = NotesArea->GetSelection();
@@ -185,14 +184,11 @@
 				std::vector<std::string> checked1Block;
 				while (std::getline(file, line))
 				{
-					
 					size_t pos = line.find(":");
 					if (pos != std::string::npos)
 					{
 						std::string checkboxName = line.substr(0, pos); 
 						std::string status = line.substr(pos + 2); 
-
-						
 						if (status == "Unchecked 0")
 						{
 							unchecked0Block.push_back(checkboxName);
@@ -244,7 +240,6 @@
 	}
 
 
-
 	void MainFrame::SaveNoteButtonClicked(wxCommandEvent& evt)
 	{
 		int selectedIndex = NotesArea->GetSelection();
@@ -270,7 +265,6 @@
 					bool isChecked = UncompletedTasksList->IsChecked(i);
 					file << itemText.mb_str() << ": " << (isChecked ? "Checked 1" : "Unchecked 0") << std::endl;
 				}
-
 				file.close();
 				wxMessageBox("Изменения сохранены.", "Информация", wxOK | wxICON_INFORMATION);
 				NoteTitleDisplay->Clear();
@@ -296,14 +290,19 @@
 		}
 	}
 	
-	
+
 	void MainFrame::SearchButtonClicked(wxCommandEvent& evt)
 	{
 		wxString searching = SearchField->GetValue();
-		if (!searching.IsEmpty())
+		if (searching.IsEmpty())
+		{
+			print_error("Введите название заметки, которую хотите найти.");
+			return;
+		}
+		else
 		{
 			NotesArea->DeselectAll();
-			for (unsigned long i = 0; i < NotesArea->GetCount(); ++i)
+			for (unsigned int i = 0; i < NotesArea->GetCount(); ++i)
 			{
 				wxString noteName = NotesArea->GetString(i);
 				if (noteName.Lower().Find(searching.Lower()) != wxNOT_FOUND)
@@ -312,12 +311,9 @@
 				}
 			}
 		}
-		else
-		{
-			print_error("Введите название заметки, которую хотите найти.");
-		}
 	}
-	
+
+
 	bool App::OnInit()
 	{
 		MainFrame* mainFrame = new MainFrame("Notes");
@@ -327,4 +323,3 @@
 		mainFrame->SetFocus();
 		return true;
 	}
-
